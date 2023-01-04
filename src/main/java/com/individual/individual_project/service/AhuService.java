@@ -3,7 +3,12 @@ package com.individual.individual_project.service;
 import com.individual.individual_project.dto.AhuRequestDto2;
 import com.individual.individual_project.entity.Ahu;
 import com.individual.individual_project.dto.AhuRequestDto;
+import com.individual.individual_project.entity.User;
+import com.individual.individual_project.jwt.JwtUtill;
 import com.individual.individual_project.repository.AhuRepository;
+import com.individual.individual_project.repository.UserRepository;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,17 +18,27 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AhuService {
     private final AhuRepository ahuRepository;
+    private final UserRepository userRepository;
+    private final JwtUtill jwtUtill;
 
-    @Transactional
-    public Ahu createAhu(AhuRequestDto requestDto){ //작성
+    public String createAhu(AhuRequestDto requestDto, HttpServletRequest request){ //작성
+        String token = jwtUtill.resolveToken(request);
+
         Ahu ahu = new Ahu(requestDto);
-        ahuRepository.save(ahu);
-        return ahu;
+        if (token != null){
+            if (jwtUtill.validateToken(token)){
+                ahuRepository.save(ahu);
+            } else {
+                throw new IllegalArgumentException("Token Error");
+            }
+        }
+
+        return ahu.getContents();
     }
 
-    @Transactional
     public List<AhuRequestDto2> getAhu() { //조회
         List<Ahu> a = ahuRepository.findAllByOrderByModifiedAtDesc();
         List<AhuRequestDto2> b = new ArrayList<>();
@@ -33,7 +48,6 @@ public class AhuService {
         return b;
     }
 
-    @Transactional
     public List<AhuRequestDto2> getAhu_id(Long id) { //조회
         List<Ahu> a = ahuRepository.findAllByOrderByModifiedAtDesc();
         List<AhuRequestDto2> b = new ArrayList<>();
@@ -45,27 +59,48 @@ public class AhuService {
         return b;
     }
 
-    @Transactional
-    public String update(Long id, AhuRequestDto requestDto){ //수정
-        Ahu ahu = ahuRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
-        );
-        if (!ahu.getPassword().equals(requestDto.getPassword())){
-            return "비밀번호가 다릅니다";
+    public String update(Long id, AhuRequestDto requestDto, HttpServletRequest request){ //수정
+        String token = jwtUtill.resolveToken(request);
+
+        Claims claims;
+
+        Ahu ahu = new Ahu(requestDto);
+
+        if (token != null){
+            if(jwtUtill.validateToken(token)){
+                claims = jwtUtill.getUserInfoFromToken(token);
+                Ahu ahu1 = ahuRepository.findById(id).orElseThrow();
+                if(claims.getSubject().equals(ahu1.getUsername())){
+                    ahu1.update(requestDto);
+                } else{
+                    return "Error";
+                }
+            }else {
+                throw new IllegalArgumentException("Token Error");
+            }
         }
-        ahu.update(requestDto);
-        return "수정완료";
+        return ahu.getContents();
     }
 
-    @Transactional
-    public String deleteAhu(Long id, AhuRequestDto requestDto){ //삭제
-        Ahu ahu = ahuRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
-        );
-        ahuRepository.deleteById(id);
-        if (!ahu.getPassword().equals(requestDto.getPassword())){
-            return "비밀번호가 다릅니다";
+    public String deleteAhu(Long id, AhuRequestDto requestDto, HttpServletRequest request){ //삭제
+        String token = jwtUtill.resolveToken(request);
+        Claims claims;
+
+        if (token != null){
+            if (jwtUtill.validateToken(token)){
+                claims = jwtUtill.getUserInfoFromToken(token);
+                Ahu ahu1 = ahuRepository.findById(id).orElseThrow();
+                if(claims.getSubject().equals(ahu1.getUsername())){
+                    ahuRepository.deleteById(id);
+                }else {
+                    return "Error";
+                }
+            } else {
+                throw new IllegalArgumentException("Token Error");
+            }
         }
         return "삭제완료";
     }
+
+
 }

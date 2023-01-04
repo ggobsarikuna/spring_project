@@ -2,6 +2,7 @@ package com.individual.individual_project.entity;
 
 import com.individual.individual_project.dto.AhuRequestDto;
 import com.individual.individual_project.dto.AhuRequestDto2;
+import com.individual.individual_project.dto.LoginRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ public class Ahu extends Timestamped{
     private String username;
     @Column(nullable = false)
     private String contents;
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
 
 
@@ -28,7 +29,10 @@ public class Ahu extends Timestamped{
         this.head = requestDto.getHead();
         this.username = requestDto.getUsername();
         this.contents = requestDto.getContents();
-        this.password = requestDto.getPassword();
+    }
+
+    public Ahu(LoginRequestDto loginRequestDto){
+        this.username = getUsername();
     }
 
     public void update(AhuRequestDto requestDto) {
