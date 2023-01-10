@@ -1,6 +1,7 @@
 package com.individual.individual_project.repository;
 
 import com.individual.individual_project.entity.User;
+import com.individual.individual_project.entity.UserRoleEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

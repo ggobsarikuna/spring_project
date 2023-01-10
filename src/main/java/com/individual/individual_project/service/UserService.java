@@ -3,7 +3,8 @@ package com.individual.individual_project.service;
 import com.individual.individual_project.dto.LoginRequestDto;
 import com.individual.individual_project.dto.SignupRequsetDto;
 import com.individual.individual_project.entity.User;
-import com.individual.individual_project.jwt.JwtUtill;
+import com.individual.individual_project.entity.UserRoleEnum;
+import com.individual.individual_project.jwt.JwtUtil;
 import com.individual.individual_project.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -18,7 +19,8 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final JwtUtill jwtUtill;
+    private final JwtUtil jwtUtill;
+    private static final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
     public void signup(SignupRequsetDto signupRequsetDto) { //중복 조회 및 회원 저장
         String username = signupRequsetDto.getUsername();
         String password = signupRequsetDto.getPassword();
@@ -29,7 +31,16 @@ public class UserService {
             throw new IllegalArgumentException("중복된 사용자가 존재합니다.");
         }
 
-        User user = new User(username, password);
+        UserRoleEnum role = UserRoleEnum.USER;
+        System.out.println("signupRequsetDto.getAdmin() = " + signupRequsetDto.getAdmin());
+        if(signupRequsetDto.getAdmin().equals(UserRoleEnum.ADMIN)){
+            if(!signupRequsetDto.getAdminToken().equals(ADMIN_TOKEN)){
+                throw new IllegalArgumentException("관리자 암호가 틀려 등록이 불가능합니다.");
+            }
+            role = UserRoleEnum.ADMIN;
+        }
+
+        User user = new User(username, password, role);
         userRepository.save(user);
     }
 
@@ -45,6 +56,6 @@ public class UserService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        response.addHeader(JwtUtill.AUTHORIZATION_HEADER, jwtUtill.createToken(user.getUsername()));
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtill.createToken(user.getUsername(), user.getRole()));
     }
 }

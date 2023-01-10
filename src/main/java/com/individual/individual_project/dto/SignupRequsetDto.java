@@ -1,5 +1,6 @@
 package com.individual.individual_project.dto;
 
+import com.individual.individual_project.entity.UserRoleEnum;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -19,4 +20,8 @@ public class SignupRequsetDto {
     @Length(min = 8, max = 15, message = "8자 이상 15자 이하 가능")
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d~!@#$%^&*()+|=]{8,15}$", message = "알파벳 대소문자, 숫자로 구성되어야 합니다.")
     private String password;
+
+    private UserRoleEnum admin = UserRoleEnum.USER;
+
+    private String adminToken = "";
 }
