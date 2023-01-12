@@ -17,6 +17,8 @@ public class AhuRequestDto2 extends Timestamped {
     private LocalDateTime createAt;
 
     private LocalDateTime modifiedAt;
+    private String comment;
+
 
     public AhuRequestDto2(Long id, Ahu ahu){
         this.id = id;
@@ -25,5 +27,6 @@ public class AhuRequestDto2 extends Timestamped {
         this.contents = ahu.getContents();
         this.createAt = ahu.getCreateAt();
         this.modifiedAt = ahu.getModifiedAt();
+        this.comment = ahu.getComment();
     }
 }

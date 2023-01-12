@@ -32,7 +32,6 @@ public class UserService {
         }
 
         UserRoleEnum role = UserRoleEnum.USER;
-        System.out.println("signupRequsetDto.getAdmin() = " + signupRequsetDto.getAdmin());
         if(signupRequsetDto.getAdmin().equals(UserRoleEnum.ADMIN)){
             if(!signupRequsetDto.getAdminToken().equals(ADMIN_TOKEN)){
                 throw new IllegalArgumentException("관리자 암호가 틀려 등록이 불가능합니다.");
@@ -43,7 +42,7 @@ public class UserService {
         User user = new User(username, password, role);
         userRepository.save(user);
     }
-
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public void login(LoginRequestDto loginRequestDto, HttpServletResponse response){
         String username = loginRequestDto.getUsername();
         String password = loginRequestDto.getPassword();

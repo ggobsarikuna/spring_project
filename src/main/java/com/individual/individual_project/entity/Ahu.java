@@ -1,11 +1,13 @@
 package com.individual.individual_project.entity;
 
 import com.individual.individual_project.dto.AhuRequestDto;
-import com.individual.individual_project.dto.AhuRequestDto2;
 import com.individual.individual_project.dto.LoginRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -24,6 +26,12 @@ public class Ahu extends Timestamped{
     @Column(nullable = true)
     private String password;
 
+    @Column(nullable = true)
+    private String comment;
+
+    @OneToMany(mappedBy = "ahu")
+    private List<Comment> comments = new ArrayList<>();
+
 
     public Ahu(AhuRequestDto requestDto) {
         this.head = requestDto.getHead();
@@ -39,5 +47,9 @@ public class Ahu extends Timestamped{
         this.head = requestDto.getHead();
         this.username = requestDto.getUsername();
         this.contents = requestDto.getContents();
+    }
+
+    public void createComment(AhuRequestDto requestDto) {
+        this.comment = requestDto.getComment();
     }
 }

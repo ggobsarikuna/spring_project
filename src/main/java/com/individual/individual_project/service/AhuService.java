@@ -40,23 +40,23 @@ public class AhuService {
     }
 
     public List<AhuRequestDto2> getAhu() { //조회
-        List<Ahu> a = ahuRepository.findAllByOrderByModifiedAtDesc();
-        List<AhuRequestDto2> b = new ArrayList<>();
-        for (Ahu ahus : a){
-            b.add(new AhuRequestDto2(ahus.getId(), ahus));
+        List<Ahu> lists = ahuRepository.findAllByOrderByModifiedAtDesc();
+        List<AhuRequestDto2> listsBox = new ArrayList<>();
+        for (Ahu ahus : lists){
+            listsBox.add(new AhuRequestDto2(ahus.getId(), ahus));
         }
-        return b;
+        return listsBox;
     }
 
     public List<AhuRequestDto2> getAhu_id(Long id) { //조회
-        List<Ahu> a = ahuRepository.findAllByOrderByModifiedAtDesc();
-        List<AhuRequestDto2> b = new ArrayList<>();
-        for (Ahu ahus : a){
+        List<Ahu> lists = ahuRepository.findAllByOrderByModifiedAtDesc();
+        List<AhuRequestDto2> listsBox = new ArrayList<>();
+        for (Ahu ahus : lists){
             if (ahus.getId().equals(id)){
-                b.add(new AhuRequestDto2(ahus.getId(), ahus));
+                listsBox.add(new AhuRequestDto2(ahus.getId(), ahus));
             }
         }
-        return b;
+        return listsBox;
     }
 
     public String update(Long id, AhuRequestDto requestDto, HttpServletRequest request, User user){ //수정
